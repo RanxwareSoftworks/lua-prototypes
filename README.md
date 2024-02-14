@@ -1,3 +1,3 @@
 # lua-prototypes
 
-Random lua scripts for testing purposes
+This repository is only used for Lua script testing! You are not able to run the script prototypes!
