@@ -300,7 +300,155 @@ task.spawn(function()
 	})
 end)
 
--- Silent-aim is sadly patched, so this feature is removed until further notice...
+-- knife silent-aim is just instakill bc im too tired to make a legit delay system lel
+combatTab:CreateSection("- Aimbot Configs -")
+task.spawn(function()
+	local silentAim = {CurrentValue = false}
+	local silentAimFOVSize = {CurrentValue = 100}
+	local silentAimFOVVisible = {CurrentValue = true}
+	local silentAimFOVColor = {Color = Color3.new(1,0,0)}
+	local silentAimAimline = {CurrentValue = false}
+	local silentAimLegit = {CurrentValue = true}
+	local silentAimWallbang = {CurrentValue = false}
+	local silentAimParams = RaycastParams.new()
+	silentAimParams.RespectCanCollide = true
+	silentAimParams.FilterType = Enum.RaycastFilterType.Exclude
+	local circle = Drawing.new("Circle")
+	circle.Color = Color3.new(1,0,0)
+	circle.Thickness = 1
+	circle.NumSides = 1e9
+	circle.Radius = 100
+	circle.Filled = false
+	circle.Visible = false
+	local aimline = Drawing.new("Line")
+	aimline.Color = Color3.new(1,0,0)
+	aimline.Thickness = 1
+	aimline.Visible = false
+	local silentAimHook;silentAimHook = hookmetamethod(game, "__namecall", function(self, ...)
+		local args = {...}
+		if silentAim.CurrentValue and not checkcaller() and getnamecallmethod() == "FireServer" then
+			if tostring(self) == "Shoot" then
+				local target = funcs.getPlayerNearestCursor(silentAimFOVSize.CurrentValue)
+				if target then
+					local hitbox = target.Character.HumanoidRootPart
+					if silentAimLegit.CurrentValue then args[2] = hitbox.CFrame.Position end
+					silentAimParams.FilterDescendantsInstances = {mvsd.you.character, funcs.getAllies()}
+					local result = workspace:Raycast(args[1], funcs.getAngle(hitbox.CFrame.Position, args[1]) * 9e9, silentAimParams)
+					if result then
+						args[3] = result.Instance
+						if silentAimLegit.CurrentValue then args[4] = result.Position end
+						if silentAimWallbang.CurrentValue then
+							args[3] = hitbox.Part
+							if silentAimLegit.CurrentValue then args[4] = hitbox.CFrame.Position end
+						end
+					else
+						args[3] = hitbox.Part
+						if silentAimLegit.CurrentValue then args[4] = hitbox.CFrame.Position end
+					end
+				end
+			elseif tostring(self) == "ThrowStart" then
+				local target = funcs.getPlayerNearestCursor(silentAimFOVSize.CurrentValue)
+				if target then
+					local hitbox = target.Character.HumanoidRootPart
+					if silentAimLegit.CurrentValue then args[2] = hitbox.CFrame.Position end
+					silentAimParams.FilterDescendantsInstances = {mvsd.you.character, funcs.getAllies()}
+					local result = workspace:Raycast(args[1], funcs.getAngle(hitbox.CFrame.Position, args[1]) * 9e9, silentAimParams)
+					local angle = funcs.getAngle(hitbox.CFrame.Position, args[1])
+					if result then
+						if silentAimLegit.CurrentValue then args[2] = funcs.getAngle(hitbox.CFrame.Position, result.Position) end
+						if result.Instance.Parent == target.Character then
+							mvsd.remotes.ThrowHit:FireServer(unpack({
+								[1] = hitbox.Part,
+								[2] = Vector3.new()
+							}))
+						end
+						if silentAimWallbang.CurrentValue then
+							if silentAimLegit.CurrentValue then args[2] = angle end
+							mvsd.remotes.ThrowHit:FireServer(unpack({
+								[1] = hitbox.Part,
+								[2] = Vector3.new()
+							}))
+						end
+					else
+						if silentAimLegit.CurrentValue then args[2] = angle end
+						mvsd.remotes.ThrowHit:FireServer(unpack({
+							[1] = hitbox.Part,
+							[2] = Vector3.new()
+						}))
+					end
+				end
+			end
+			return self.FireServer(self, unpack(args))
+		end
+		return silentAimHook(self, ...)
+	end)
+	silentAim = combatTab:CreateToggle({
+		Name = "Silent-Aim [BETA]",
+		CurrentValue = false,
+		Callback = function(value)
+			if value then
+				ranxConnections:BindToRenderStep("FovCircleRender", function()
+					circle.Visible = silentAim.CurrentValue and silentAimFOVVisible.CurrentValue
+					circle.Radius = silentAimFOVSize.CurrentValue
+					circle.Position = funcs.getMouseLocation()
+					circle.Color = silentAimFOVColor.Color
+					aimline.Color = silentAimFOVColor.Color
+					local target = funcs.getPlayerNearestCursor(silentAimFOVSize.CurrentValue)
+					if target then
+						local root = target.Character.HumanoidRootPart
+						local viewpoint, vis = workspace.CurrentCamera:WorldToViewportPoint(root.Position)
+						aimline.Visible = silentAim.CurrentValue and silentAimAimline.CurrentValue and vis
+						aimline.From = funcs.getMouseLocation()
+						aimline.To = Vector2.new(viewpoint.X, viewpoint.Y)
+					else
+						aimline.Visible = false
+						aimline.From = Vector2.new()
+						aimline.To = Vector2.new()
+					end
+				end)
+			else
+				ranxConnections:UnbindConnection("FovCircleRender")
+				circle.Visible = false
+				aimline.Visible = false
+				aimline.From = Vector2.new()
+				aimline.To = Vector2.new()
+			end
+		end
+	})
+	silentAimFOVSize = combatTab:CreateSlider({
+		Name = "FOV Size",
+		Range = {10,1000},
+		Increment = 10,
+		CurrentValue = 100,
+		Callback = function() end
+	})
+	silentAimFOVVisible = combatTab:CreateToggle({
+		Name = "Show FOV Circle",
+		CurrentValue = true,
+		Callback = function() end
+	})
+	silentAimFOVColor = combatTab:CreateColorPicker({
+		Name = "FOV Color",
+		Color = Color3.new(1,0,0),
+		Callback = function() end
+	})
+	silentAimAimline = combatTab:CreateToggle({
+		Name = "Show Aimline",
+		CurrentValue = false,
+		Callback = function() end
+	})
+	silentAimLegit = combatTab:CreateToggle({
+		Name = "Legit Mode",
+		CurrentValue = true,
+		Callback = function() end
+	})
+	silentAimWallbang = combatTab:CreateToggle({
+		Name = "Wallbang",
+		CurrentValue = false,
+		Callback = function() end
+	})
+end)
+
 
 combatTab:CreateSection("- Weapon Spoofs -")
 task.spawn(function()
