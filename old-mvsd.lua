@@ -1607,7 +1607,9 @@ task.spawn(function()
 end)
 
 -- MISC --
-miscTab:CreateSection("- Automated Configs -")
+
+-- useless features, will need to update them soon
+--[[miscTab:CreateSection("- Automated Configs -")
 task.spawn(function()
 	local autochoose = {CurrentValue = false}
 	local autochooseWeapon = {CurrentOption = {"Murderer"}}
@@ -1761,7 +1763,7 @@ task.spawn(function()
 		CurrentOption = {"1v1"},
 		Callback = function() end
 	})
-end)
+end)]]
 
 miscTab:CreateSection("- Trolling Configs -")
 task.spawn(function()
