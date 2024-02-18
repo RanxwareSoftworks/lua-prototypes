@@ -223,6 +223,10 @@ ranxConnections:BindConnection("NormalRoundEnded", mvsd.remotes.OnRoundEnded.OnC
 	roundEnded = true
 end))
 
+local silentAimParams = RaycastParams.new()
+silentAimParams.RespectCanCollide = true
+silentAimParams.FilterType = Enum.RaycastFilterType.Exclude
+
 local silentAimHook;silentAimHook = hookmetamethod(game, "__namecall", function(self, ...)
 	local args = {...}
 	if not checkcaller() and getnamecallmethod() == "FireServer" then
@@ -236,10 +240,6 @@ local silentAimHook;silentAimHook = hookmetamethod(game, "__namecall", function(
 				if result then
 					args[3] = result.Instance
 					args[4] = result.Position
-					if silentAimWallbang.CurrentValue then
-						args[3] = hitbox.Part
-						args[4] = hitbox.CFrame.Position
-					end
 				else
 					args[3] = hitbox.Part
 					args[4] = hitbox.CFrame.Position
@@ -256,13 +256,6 @@ local silentAimHook;silentAimHook = hookmetamethod(game, "__namecall", function(
 				if result then
 					args[2] = funcs.getAngle(hitbox.CFrame.Position, result.Position)
 					if result.Instance.Parent == target.Character then
-						mvsd.remotes.ThrowHit:FireServer(unpack({
-							[1] = hitbox.Part,
-							[2] = Vector3.new()
-						}))
-					end
-					if silentAimWallbang.CurrentValue then
-						args[2] = angle
 						mvsd.remotes.ThrowHit:FireServer(unpack({
 							[1] = hitbox.Part,
 							[2] = Vector3.new()
