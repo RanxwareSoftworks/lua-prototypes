@@ -313,7 +313,7 @@ task.spawn(function()
 	local silentAimParams = RaycastParams.new()
 	silentAimParams.RespectCanCollide = true
 	silentAimParams.FilterType = Enum.RaycastFilterType.Exclude
-	local circle = Drawing.new("Circle")
+	--[[local circle = Drawing.new("Circle")
 	circle.Color = Color3.new(1,0,0)
 	circle.Thickness = 1
 	circle.NumSides = 1e9
@@ -323,7 +323,7 @@ task.spawn(function()
 	local aimline = Drawing.new("Line")
 	aimline.Color = Color3.new(1,0,0)
 	aimline.Thickness = 1
-	aimline.Visible = false
+	aimline.Visible = false]]
 	local silentAimHook;silentAimHook = hookmetamethod(game, "__namecall", function(self, ...)
 		local args = {...}
 		if silentAim.CurrentValue and not checkcaller() and getnamecallmethod() == "FireServer" then
@@ -388,7 +388,7 @@ task.spawn(function()
 		Callback = function(value)
 			if value then
 				ranxConnections:BindToRenderStep("FovCircleRender", function()
-					circle.Visible = silentAim.CurrentValue and silentAimFOVVisible.CurrentValue
+					--[[circle.Visible = silentAim.CurrentValue and silentAimFOVVisible.CurrentValue
 					circle.Radius = silentAimFOVSize.CurrentValue
 					circle.Position = funcs.getMouseLocation()
 					circle.Color = silentAimFOVColor.Color
@@ -404,18 +404,18 @@ task.spawn(function()
 						aimline.Visible = false
 						aimline.From = Vector2.new()
 						aimline.To = Vector2.new()
-					end
+					end]]
 				end)
 			else
-				ranxConnections:UnbindConnection("FovCircleRender")
+				--[[ranxConnections:UnbindConnection("FovCircleRender")
 				circle.Visible = false
 				aimline.Visible = false
 				aimline.From = Vector2.new()
-				aimline.To = Vector2.new()
+				aimline.To = Vector2.new()]]
 			end
 		end
 	})
-	silentAimFOVSize = combatTab:CreateSlider({
+	--[[silentAimFOVSize = combatTab:CreateSlider({
 		Name = "FOV Size",
 		Range = {10,1000},
 		Increment = 10,
@@ -436,7 +436,7 @@ task.spawn(function()
 		Name = "Show Aimline",
 		CurrentValue = false,
 		Callback = function() end
-	})
+	})]]
 	silentAimLegit = combatTab:CreateToggle({
 		Name = "Legit Mode",
 		CurrentValue = true,
@@ -1027,7 +1027,7 @@ local function WorldToScreenPoint(position)
 end
 
 visualsTab:CreateSection("- ESP Configs -")
-task.spawn(function()
+--[[task.spawn(function()
 	local boxTable = {}
 	local function EstimatePosition(pos)
 		return Vector2.new(math.floor(pos.X), math.floor(pos.Y))
@@ -1157,7 +1157,7 @@ task.spawn(function()
 			end
 		end
 	})
-end)
+end)]]
 task.spawn(function()
 	local chamsTable = {}
 	local function drawHighlight(player)
@@ -1240,7 +1240,7 @@ task.spawn(function()
 		end
 	})
 end)
-task.spawn(function()
+--[[task.spawn(function()
 	local tracersTable = {}
 	local tracerOrigin = {CurrentOption = {"Bottom"}}
 
@@ -1333,7 +1333,7 @@ task.spawn(function()
 		CurrentOption = {"Bottom"},
 		Callback = function() end
 	})
-end)
+end)]]
 task.spawn(function()
 	local nametagsTable = {}
 	local tagTexts = {}
